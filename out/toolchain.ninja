@@ -1,0 +1,65 @@
+rule cc
+  command =  clang -MMD -MF ${out}.d ${defines} ${include_dirs} ${cflags} ${cflags_c} -c ${in} -o ${out}
+  description = CC ${out}
+  depfile = ${out}.d
+  deps = gcc
+rule cxx
+  command =  clang++ -MMD -MF ${out}.d ${defines} ${include_dirs} ${cflags} ${cflags_cc} -c ${in} -o ${out}
+  description = CXX ${out}
+  depfile = ${out}.d
+  deps = gcc
+rule objc
+  command =  clang -MMD -MF ${out}.d ${defines} ${include_dirs} ${cflags} ${cflags_objc} -c ${in} -o ${out}
+  description = OBJC ${out}
+  depfile = ${out}.d
+  deps = gcc
+rule objcxx
+  command =  clang++ -MMD -MF ${out}.d ${defines} ${include_dirs} ${cflags} ${cflags_objcc} -c ${in} -o ${out}
+  description = OBJCXX ${out}
+  depfile = ${out}.d
+  deps = gcc
+rule asm
+  command =  clang -MMD -MF ${out}.d ${defines} ${include_dirs} ${asmflags} -c ${in} -o ${out}
+  description = ASM ${out}
+  depfile = ${out}.d
+  deps = gcc
+rule alink
+  command =  rm -f ${out} && TOOL_VERSION=1494815926 python ../build/toolchain/mac/filter_libtool.py libtool -static ${arflags} -o ${out} ${in}
+  description = LIBTOOL-STATIC ${out}
+rule solink
+  command =  if [ ! -e "${output_dir}/${target_output_name}${output_extension}" -o ! -e "${output_dir}/${target_output_name}${output_extension}.TOC" ] || otool -l "${output_dir}/${target_output_name}${output_extension}" | grep -q LC_REEXPORT_DYLIB ; then TOOL_VERSION=1494815926 ../build/toolchain/mac/linker_driver.py clang++ -shared  -Wcrl,dsym,${root_out_dir} ${ldflags} -o "${output_dir}/${target_output_name}${output_extension}" -Wl,-filelist,"${output_dir}/${target_output_name}${output_extension}.rsp" ${libs} ${solibs} && { otool -l "${output_dir}/${target_output_name}${output_extension}" | grep LC_ID_DYLIB -A 5; nm -gP "${output_dir}/${target_output_name}${output_extension}" | cut -f1-2 -d' ' | grep -v U$$$$; true; } > "${output_dir}/${target_output_name}${output_extension}.TOC"; else TOOL_VERSION=1494815926 ../build/toolchain/mac/linker_driver.py clang++ -shared  -Wcrl,dsym,${root_out_dir} ${ldflags} -o "${output_dir}/${target_output_name}${output_extension}" -Wl,-filelist,"${output_dir}/${target_output_name}${output_extension}.rsp" ${libs} ${solibs} && { otool -l "${output_dir}/${target_output_name}${output_extension}" | grep LC_ID_DYLIB -A 5; nm -gP "${output_dir}/${target_output_name}${output_extension}" | cut -f1-2 -d' ' | grep -v U$$$$; true; } > "${output_dir}/${target_output_name}${output_extension}.tmp" && if ! cmp -s "${output_dir}/${target_output_name}${output_extension}.tmp" "${output_dir}/${target_output_name}${output_extension}.TOC"; then mv "${output_dir}/${target_output_name}${output_extension}.tmp" "${output_dir}/${target_output_name}${output_extension}.TOC" ; fi; fi
+  description = SOLINK ${out}
+  rspfile = ${output_dir}/${target_output_name}${output_extension}.rsp
+  rspfile_content = ${in_newline}
+  pool = build_toolchain_link_pool
+  restat = 1
+rule solink_module
+  command =  TOOL_VERSION=1494815926 ../build/toolchain/mac/linker_driver.py clang++ -bundle ${ldflags} -o "${output_dir}/${target_output_name}${output_extension}" -Wl,-filelist,"${output_dir}/${target_output_name}${output_extension}.rsp" -Wcrl,dsym,${root_out_dir}  ${solibs} ${libs}
+  description = SOLINK_MODULE ${out}
+  rspfile = ${output_dir}/${target_output_name}${output_extension}.rsp
+  rspfile_content = ${in_newline}
+  pool = build_toolchain_link_pool
+rule link
+  command =  TOOL_VERSION=1494815926 ../build/toolchain/mac/linker_driver.py clang++  -Wcrl,dsym,${root_out_dir}  ${ldflags} -o "${output_dir}/${target_output_name}${output_extension}" -Wl,-filelist,"${output_dir}/${target_output_name}${output_extension}.rsp" ${solibs} ${libs}
+  description = LINK ${output_dir}/${target_output_name}${output_extension}
+  rspfile = ${output_dir}/${target_output_name}${output_extension}.rsp
+  rspfile_content = ${in_newline}
+  pool = build_toolchain_link_pool
+rule stamp
+  command = touch ${out}
+  description = STAMP ${out}
+rule copy
+  command = ln -f ${in} ${out} 2>/dev/null || (rm -rf ${out} && cp -af ${in} ${out})
+  description = COPY ${in} ${out}
+rule copy_bundle_data
+  command = rm -rf ${out} && if [[ -d ${in} ]]; then mkdir -p ${out} && cd ${in} && pax -rwl . "$$OLDPWD"/${out}; else ln -f ${in} ${out} 2>/dev/null || (rm -rf ${out} && cp -af ${in} ${out}); fi
+  description = COPY_BUNDLE_DATA ${in} ${out}
+  pool = build_toolchain_mac_bundle_pool
+rule compile_xcassets
+  command =  rm -f ${out} && TOOL_VERSION=1494815926 python ../build/toolchain/mac/compile_xcassets.py -p macosx -t 10.9 -T ${product_type} -o ${out} ${in}
+  description = COMPILE_XCASSETS ${out}
+  pool = build_toolchain_mac_bundle_pool
+
+subninja obj/hello.ninja
+subninja obj/hello_shared.ninja
+subninja obj/hello_static.ninja

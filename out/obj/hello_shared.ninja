@@ -1,0 +1,16 @@
+defines = -DHELLO_SHARED_IMPLEMENTATION -DCR_XCODE_VERSION=0821 -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORE=0 -D_DEBUG
+include_dirs =
+cflags = -fno-strict-aliasing -fdiagnostics-color -arch x86_64 -fstack-protector-strong -O0 -fno-omit-frame-pointer -gdwarf-2 -fno-standalone-debug -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.9 -fvisibility=hidden
+cflags_cc = -fvisibility-inlines-hidden -stdlib=libc++ -std=c++11 -frtti -fexceptions
+label_name = hello_shared
+root_out_dir = .
+target_out_dir = obj
+target_output_name = libhello_shared
+
+build obj/hello_shared/hello_shared.o: cxx ../hello_shared.cc
+
+build ./libhello_shared.dylib ./libhello_shared.dylib.TOC ./libhello_shared.dylib.dSYM/ ./libhello_shared.dylib.dSYM/Contents/Info.plist ./libhello_shared.dylib.dSYM/Contents/Resources/DWARF/libhello_shared.dylib: solink obj/hello_shared/hello_shared.o
+  ldflags = -stdlib=libc++ -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.9 -Wl,-ObjC
+  libs = -framework AppKit -framework ApplicationServices -framework Carbon -framework CoreFoundation -framework Foundation -framework IOKit -framework OpenGL -framework Security
+  output_extension = .dylib
+  output_dir = .
