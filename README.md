@@ -2,6 +2,18 @@
 
 GN is a meta-build system that generates NinjaBuild files so that you can build Chromium with Ninja.
 
+## Supported platforms
+
+The toolchains have been tested on the following platforms:
+
+* Windows (MSVC 2013/2015/2017, Clang 3.8)
+* FreeBSD (GCC 5, Clang 3.7)
+* Linux (GCC 4.9, Clang 3.8)
+* OS X (Xcode 7.3.1)
+
+[![Build Status](https://travis-ci.org/timniederhausen/gn-build.svg?branch=master)]
+[![Build status](https://ci.appveyor.com/api/projects/status/jpot0c7wp6e78lkk?svg=true)]
+
 
 gn-stuff:GN的一些相关东西，实际项目中，可以删除该目录
 
