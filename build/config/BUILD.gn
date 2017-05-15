@@ -317,7 +317,7 @@ config("compiler") {
   # ------------------------------------
   if (is_clang) {
     cflags += [ "-fcolor-diagnostics" ]
-  } else if (!is_win) {
+  } else if (!is_win && !is_posix) {
     cflags += [ "-fdiagnostics-color" ]
   }
 
