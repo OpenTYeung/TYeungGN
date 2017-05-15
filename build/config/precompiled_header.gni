@@ -20,7 +20,7 @@ template("precompiled_header") {
   assert(defined(invoker.precompiled_header),
          "Need precompiled_header in $target_name.")
   assert(defined(invoker.precompiled_source),
-         "Need precompiled_header in $target_name.")
+         "Need precompiled_source in $target_name.")
 
   config(target_name) {
     if (!disable_precompiled_headers) {

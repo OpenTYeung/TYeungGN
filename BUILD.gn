@@ -5,13 +5,13 @@
 import("//build/config/precompiled_header.gni")
 
 precompiled_header("hello_pch") {
-  precompiled_header = "precompile.h"
-  precompiled_source = "//precompile.cc"
+  precompiled_header = "./source/precompile.h"
+  precompiled_source = "//source/precompile.cc"
 }
 
 executable("hello") {
   sources = [
-    "hello.cc",
+    "//source/hello.cc",
   ]
 
   configs += [ ":hello_pch" ]
@@ -24,8 +24,8 @@ executable("hello") {
 
 shared_library("hello_shared") {
   sources = [
-    "hello_shared.cc",
-    "hello_shared.h",
+    "//source/hello_shared.cc",
+    "//source/hello_shared.h",
   ]
 
   defines = [ "HELLO_SHARED_IMPLEMENTATION" ]
@@ -33,7 +33,7 @@ shared_library("hello_shared") {
 
 static_library("hello_static") {
   sources = [
-    "hello_static.cc",
-    "hello_static.h",
+    "//source/hello_static.cc",
+    "//source/hello_static.h",
   ]
 }
